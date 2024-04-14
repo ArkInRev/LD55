@@ -38,7 +38,7 @@ public class ThirdPersonController : MonoBehaviour
     }
     void Update()
     {
-        look = (Input.GetAxisRaw("Mouse X") * rotSpeed * sensitivity);
+        look = (Mathf.Clamp(Input.GetAxisRaw("Mouse X"),-1,1) * rotSpeed * sensitivity);
         vertLook = (Input.GetAxisRaw("Mouse Y") * rotSpeed * sensitivity);
 
         if (Input.GetKeyDown(KeyCode.LeftShift)) ToggleCursorLock();

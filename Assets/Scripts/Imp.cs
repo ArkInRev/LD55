@@ -15,12 +15,36 @@ public class Imp : MonoBehaviour, IDamageable
     
     public float rotSpeed = 5f;
 
-    public ParticleSystem explosionParticles;
+    public GameObject explosionParticles;
     // Start is called before the first frame update
+
+    public float pitchMin = 0.8f;
+    public float pitchMax = 1.2f;
+    public float volumeMin = 0.25f;
+    public float volumeMax = 0.75f;
+
+    public List<AudioClip> impSummonAudioClips;
+    public AudioClip impShootAudioClip;
+    public AudioClip currentClip;
+    public AudioSource audioSource;
+
+    public AudioClip ShootFireballClip;
+    public AudioClip impSummonClip;
+
+
     void Start()
     {
         health = maxHealth;
         Shoot();
+        audioSource = GetComponent<AudioSource>();
+
+
+        currentClip = impSummonAudioClips[Random.Range(0, impSummonAudioClips.Count)];
+        audioSource.clip = currentClip;
+        audioSource.pitch = Random.Range(pitchMin, pitchMax);
+        audioSource.volume = Random.Range(volumeMin, ((volumeMax - volumeMin) / 4) + volumeMin);
+        audioSource.PlayOneShot(currentClip);
+
     }
 
     // Update is called once per frame
@@ -73,5 +97,11 @@ public class Imp : MonoBehaviour, IDamageable
         Rigidbody bulletRB = bullet.GetComponent<Rigidbody>();
         bulletRB.AddForce(muzzleTip.forward * bulletForce, ForceMode.Impulse);
         timeSinceLastShot = 0;
+
+        currentClip = impShootAudioClip;
+        audioSource.clip = currentClip;
+        audioSource.pitch = Random.Range(pitchMin, pitchMax);
+        audioSource.volume = Random.Range(volumeMin, ((volumeMax - volumeMin) / 4) + volumeMin);
+        audioSource.PlayOneShot(currentClip);
     }
 }

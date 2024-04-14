@@ -12,16 +12,30 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float _normalSpeedMod = 1f;
 
+    public List<AudioClip> playerFootstepAudioClips;
+    public AudioClip currentClip;
+    public AudioSource audioSource;
+
+    public AudioClip ShootFireballClip;
+    public AudioClip impSummonClip;
+
+    public float ticksUntilFootstep = 3f;
+    public float ticksSinceLastFootstep = 0f;
 
     //public List<AudioClip> walkAudioClips;
 
-//    public AudioClip currentClip;
-//    public AudioSource audioSource;
+    //    public AudioClip currentClip;
+    //    public AudioSource audioSource;
 
     public float pitchMin = 0.8f;
     public float pitchMax = 1.2f;
     public float volumeMin = 0.25f;
     public float volumeMax = 0.75f;
+
+    public float volumeFootMin = 0.15f;
+    public float volumeFootMax = 0.35f;
+
+    public GameObject ImpContainer;
 
     [SerializeField]
     private Transform followPoint;
@@ -46,7 +60,7 @@ public class PlayerController : MonoBehaviour
         trySummon = false;
         gm = GameManager.Instance;
         GameManager.Instance.onTick += gameTick;
- //       audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -105,11 +119,18 @@ public class PlayerController : MonoBehaviour
 
     private GameObject summonImp()
     {
-        GameObject obj = Instantiate(impPrefab, impSummonPoint.position, impSummonPoint.rotation);
+        GameObject obj = Instantiate(impPrefab, impSummonPoint.position, impSummonPoint.rotation, ImpContainer.transform);
         obj.transform.position = impSummonPoint.position;
         Instantiate(summonParticles, obj.transform);
         gm.spendFirepower(gm.getImpCost()); 
         trySummon = false;
+
+        currentClip = impSummonClip;
+        audioSource.clip = currentClip;
+        audioSource.pitch = Random.Range(pitchMin, pitchMax);
+        audioSource.volume = Random.Range(volumeMin, ((volumeMax - volumeMin) / 4) + volumeMin);
+        audioSource.PlayOneShot(currentClip);
+
         return obj;
     }
 
@@ -128,6 +149,13 @@ public class PlayerController : MonoBehaviour
         bulletRB.AddForce(shootpoint.forward * bulletForce, ForceMode.Impulse);
         gm.spendFirepower(gm.getShootCost());
         tryShoot = false;
+
+        currentClip = ShootFireballClip;
+        audioSource.clip = currentClip;
+        audioSource.pitch = Random.Range(pitchMin, pitchMax);
+        audioSource.volume = Random.Range(volumeMin, ((volumeMax - volumeMin) / 4) + volumeMin);
+        audioSource.PlayOneShot(currentClip);
+
         return obj;
     }
 
@@ -142,14 +170,24 @@ public class PlayerController : MonoBehaviour
     {
         if (isWalking)
         {
-           // footstep
+            // footstep
+            makeNoise();
         }
+    }
+
+    public void makeNoise()
+    {
+
+            currentClip = playerFootstepAudioClips[Random.Range(0, playerFootstepAudioClips.Count)];
+            audioSource.clip = currentClip;
+            audioSource.pitch = Random.Range(pitchMin, pitchMax);
+            audioSource.volume = Random.Range(volumeFootMin, ((volumeFootMax - volumeFootMin) / 4) + volumeFootMin);
+            audioSource.PlayOneShot(currentClip);
+
     }
 
 
 
-    
-    
     private bool checkForWin()
     {
 

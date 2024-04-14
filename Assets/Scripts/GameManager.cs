@@ -30,7 +30,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private float fireInForge = 0f;
     private float fireInForgeToWin = 100f;
-    
+
+    private bool growled = false; 
 
     //Firepower
     [SerializeField]
@@ -55,7 +56,7 @@ public class GameManager : MonoBehaviour
     public TMP_Text GameOverDetails;
     public TMP_Text GameOverButtonText;
     public Animator handAnimations;
-
+    public GameObject gameOverFires;
 
 
     [SerializeField]
@@ -67,6 +68,18 @@ public class GameManager : MonoBehaviour
     public float playerDamageCaused = 1f;
     public float enemyDamageCaused = 1f;
     public float impDamageCaused = 3f;
+
+    public float pitchMin = 0.8f;
+    public float pitchMax = 1.2f;
+    public float volumeMin = 0.25f;
+    public float volumeMax = 0.75f;
+
+    public AudioClip GameOverAudioClip;
+    public AudioClip currentClip;
+    public AudioSource audioSource;
+
+    public GameObject ImpContainer;
+
 
     public void Awake()
     {
@@ -85,11 +98,11 @@ public class GameManager : MonoBehaviour
         _triggerEvery = maxGameTime / 10f;
         _ticksSinceFirepowerRegen = 0;
         Cursor.lockState = CursorLockMode.Confined;
-
+        gameOverFires.SetActive(false);
         Time.timeScale = 0f;
         gameVirtualCamera.Priority = 10;
         menuVirtualCamera.Priority = 1;
-
+        audioSource = GetComponent<AudioSource>();
         TitleScreen.alpha = 1;
         MainUI.alpha = 0;
         TitleScreen.interactable = true;
@@ -229,11 +242,16 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
         gameVirtualCamera.Priority = 1;
         menuVirtualCamera.Priority = 10;
-
+        gameOverFires.SetActive(true);
         //Animator parts
         handAnimations.SetBool("GameOver", true);
         handAnimations.SetBool("WinOrLose", win);
 
+
+        if (!growled)
+        {
+            GrowlOnce();
+        }
 
         if (win)
         {
@@ -332,5 +350,19 @@ public class GameManager : MonoBehaviour
     {
         fireInForge += (int)fireforgeChange;
         forgefireChange();
+    }
+
+    private void GrowlOnce()
+    {
+        if (!growled)
+        {
+            currentClip = GameOverAudioClip;
+            audioSource.clip = currentClip;
+            audioSource.pitch = UnityEngine.Random.Range(pitchMin, pitchMax);
+            audioSource.volume = UnityEngine.Random.Range(volumeMin, ((volumeMax - volumeMin) / 4) + volumeMin);
+            audioSource.PlayOneShot(currentClip);
+            growled = true;
+        }
+
     }
 }

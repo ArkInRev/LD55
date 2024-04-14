@@ -39,8 +39,11 @@ public class summoningController : MonoBehaviour
             bool didTheyWin = gm.EnoughForge();
             gm.gameOver(didTheyWin);
         }
-        _candleArray[numCandles - 1].SetActive(true);
-        
+        if (numCandles < 11)
+        {
+            _candleArray[numCandles - 1].SetActive(true);
+        }
+       
     }
 
     private void ResetCandles()

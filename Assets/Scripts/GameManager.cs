@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private float fireInForge = 0f;
     private float fireInForgeToWin = 100f;
+    
 
     //Firepower
     [SerializeField]
@@ -43,6 +44,8 @@ public class GameManager : MonoBehaviour
     private int _ticksSinceFirepowerRegen = 0;
     [SerializeField]
     private int _firepowerPerRegen = 5;
+    [SerializeField]
+    private int _shootCost = 2;
 
     public CanvasGroup MainUI;
     // Game over screens
@@ -51,11 +54,19 @@ public class GameManager : MonoBehaviour
     public TMP_Text GameOverMessage;
     public TMP_Text GameOverDetails;
     public TMP_Text GameOverButtonText;
+    public Animator handAnimations;
+
+
 
     [SerializeField]
     private Cinemachine.CinemachineVirtualCamera gameVirtualCamera;
     [SerializeField]
     private Cinemachine.CinemachineVirtualCamera menuVirtualCamera;
+
+    // Projectile Control
+    public float playerDamageCaused = 1f;
+    public float enemyDamageCaused = 1f;
+    public float impDamageCaused = 3f;
 
     public void Awake()
     {
@@ -172,6 +183,19 @@ public class GameManager : MonoBehaviour
 
     }
 
+    //Every time Forgefire Changes
+    public event Action<float> onForgefireChange;
+    public void forgefireChange()
+    {
+
+        ;
+        if (onForgefireChange != null)
+        {
+            onForgefireChange(fireInForge);
+        }
+
+    }
+
     public event Action onTick;
     public void Tick()
     {
@@ -196,14 +220,21 @@ public class GameManager : MonoBehaviour
         TitleScreen.blocksRaycasts = false;
         Cursor.lockState = CursorLockMode.Locked;
         onFirepowerChange(_firepower);
+        onForgefireChange(fireInForge);
 
     }
     public void gameOver(bool win)
     {
         Cursor.lockState = CursorLockMode.Confined;
-        Time.timeScale = 0;
+        Time.timeScale = 1;
         gameVirtualCamera.Priority = 1;
         menuVirtualCamera.Priority = 10;
+
+        //Animator parts
+        handAnimations.SetBool("GameOver", true);
+        handAnimations.SetBool("WinOrLose", win);
+
+
         if (win)
         {
             GameOverButtonText.SetText("Main Menu");
@@ -258,5 +289,48 @@ public class GameManager : MonoBehaviour
     public float getImpCost()
     {
         return _impCost;
+    }
+
+    public float getShootCost()
+    {
+        return _shootCost;
+    }
+
+    public float getFireInForge()
+    {
+        return fireInForge;
+    }
+
+    public float getFireInForgeToWin()
+    {
+        return fireInForgeToWin;
+    }
+   
+    public float GetPlayerDamage()
+    {
+        return playerDamageCaused;
+    }
+    public float GetEnemyDamage()
+    {
+        return enemyDamageCaused;
+    }
+
+    public float GetImpDamage()
+    {
+        return impDamageCaused;
+    }
+
+
+    public void spendFirepower(float firepowerToSpend)
+    {
+        _firepower -= (int)firepowerToSpend;
+        _firepower = Mathf.Clamp(_firepower, 0, _maximumFirepower);
+        firepowerChange();
+    }
+
+    public void changeFireforge(float fireforgeChange)
+    {
+        fireInForge += (int)fireforgeChange;
+        forgefireChange();
     }
 }

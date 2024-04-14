@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
 
     public bool isWalking = false;
-
+    private GameManager gm;
 
     public float speedModifier;
     [SerializeField]
@@ -32,12 +32,19 @@ public class PlayerController : MonoBehaviour
     public Transform impSummonPoint;
     public ParticleSystem summonParticles;
 
+    public Transform shootpoint;
+    public GameObject projectile;
+    public float bulletForce = 7f;
+
 
     private bool trySummon;
-
+    private bool tryShoot;
 
     void Start()
     {
+        tryShoot = false;
+        trySummon = false;
+        gm = GameManager.Instance;
         GameManager.Instance.onTick += gameTick;
  //       audioSource = GetComponent<AudioSource>();
     }
@@ -61,14 +68,38 @@ public class PlayerController : MonoBehaviour
             trySummon = false;
         }
 
+        if ((Input.GetButtonDown("Fire1")))
+        {
+
+            tryShoot = true;
+        }
+        else
+        {
+
+        }
+
+        if (Input.GetButtonUp("Fire1"))
+        {
+            tryShoot = false;
+        }
+
     }
 
     private void FixedUpdate()
     {
         if (trySummon)
         {
-            Debug.Log("Try to summon an imp");
-            GameObject go = summonImp();
+            if (TryToSummon())
+            {
+                GameObject go = summonImp();
+            }
+        }
+        if (tryShoot)
+        {
+            if (TryToShoot())
+            {
+                GameObject go = shootFire();
+            }
         }
     }
 
@@ -77,10 +108,35 @@ public class PlayerController : MonoBehaviour
         GameObject obj = Instantiate(impPrefab, impSummonPoint.position, impSummonPoint.rotation);
         obj.transform.position = impSummonPoint.position;
         Instantiate(summonParticles, obj.transform);
+        gm.spendFirepower(gm.getImpCost()); 
         trySummon = false;
         return obj;
     }
 
+    private bool TryToSummon()
+    {
+        float firepower = gm.getFirepower();
+        float firepowerToSummon = gm.getImpCost();
+        return (firepower >= firepowerToSummon);
+    }
+
+    private GameObject shootFire()
+    {
+        GameObject obj = Instantiate(projectile, shootpoint.transform.position, shootpoint.rotation);
+        obj.transform.position = shootpoint.position;
+        Rigidbody bulletRB = obj.GetComponent<Rigidbody>();
+        bulletRB.AddForce(shootpoint.forward * bulletForce, ForceMode.Impulse);
+        gm.spendFirepower(gm.getShootCost());
+        tryShoot = false;
+        return obj;
+    }
+
+    private bool TryToShoot()
+    {
+        float firepower = gm.getFirepower();
+        float firepowerToShoot = gm.getShootCost();
+        return (firepower >= firepowerToShoot);
+    }
 
     public void gameTick()
     {

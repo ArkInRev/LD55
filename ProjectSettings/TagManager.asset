@@ -8,6 +8,8 @@ TagManager:
   - impProjectile
   - playerProjectile
   - enemyProjectile
+  - forgeLocation
+  - Enemy
   layers:
   - Default
   - TransparentFX

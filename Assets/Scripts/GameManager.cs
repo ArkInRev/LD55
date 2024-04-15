@@ -79,6 +79,7 @@ public class GameManager : MonoBehaviour
     public AudioSource audioSource;
 
     public GameObject ImpContainer;
+    public GameObject Forge;
 
 
     public void Awake()
@@ -346,11 +347,29 @@ public class GameManager : MonoBehaviour
         firepowerChange();
     }
 
+    public void gainFirepower(float firepowerToGain)
+    {
+        _firepower += (int)firepowerToGain;
+        _firepower = Mathf.Clamp(_firepower, 0, _maximumFirepower);
+        firepowerChange();
+    }
+
     public void changeFireforge(float fireforgeChange)
     {
         fireInForge += (int)fireforgeChange;
         forgefireChange();
     }
+
+    public void drainFireforge(float fireforgeChange)
+    {
+        fireInForge -= (int)fireforgeChange;
+        if (fireInForge < 0)
+        {
+            fireInForge = 0;
+        }
+        forgefireChange();
+    }
+
 
     private void GrowlOnce()
     {

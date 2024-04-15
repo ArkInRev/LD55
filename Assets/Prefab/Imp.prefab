@@ -5016,7 +5016,7 @@ GameObject:
   - component: {fileID: 6310763477263543110}
   m_Layer: 0
   m_Name: Imp
-  m_TagString: Untagged
+  m_TagString: Imp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

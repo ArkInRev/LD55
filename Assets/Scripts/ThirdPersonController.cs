@@ -16,6 +16,8 @@ public class ThirdPersonController : MonoBehaviour
     private float rotSpeed = 200f;
     [SerializeField]
     private Transform cameraFollowPoint;
+    [SerializeField]
+    private float webGLsensitivity = 0.6f;
 
     public float upClampRot, downClampRot;
 
@@ -38,8 +40,8 @@ public class ThirdPersonController : MonoBehaviour
     }
     void Update()
     {
-        look = (Mathf.Clamp(Input.GetAxisRaw("Mouse X"),-1,1) * rotSpeed * sensitivity);
-        vertLook = (Input.GetAxisRaw("Mouse Y") * rotSpeed * sensitivity);
+        look = (Mathf.Clamp(Input.GetAxisRaw("Mouse X"),-1,1) * rotSpeed * sensitivity * webGLsensitivity);
+        vertLook = (Input.GetAxisRaw("Mouse Y") * rotSpeed * sensitivity *webGLsensitivity);
 
         if (Input.GetKeyDown(KeyCode.LeftShift)) ToggleCursorLock();
         if (Input.GetKeyDown(KeyCode.Alpha1)) sensitivity = 0.05f;
